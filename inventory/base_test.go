@@ -1,8 +1,10 @@
-package inventory
+package qtypes_inventory
 
 import (
 	"testing"
+	"time"
 	"github.com/stretchr/testify/assert"
+	"github.com/qframe/types/messages"
 )
 
 
@@ -11,7 +13,9 @@ const (
 )
 
 func TestNewBaseFromJson(t *testing.T) {
-	b, err := NewBaseFromJson(inv1)
+	ts := time.Unix(1499156134, 0)
+	qb := qtypes_messages.NewTimedBase("src1", ts)
+	b, err := NewBaseFromJson(qb, inv1)
 	assert.NoError(t, err)
 	assert.Equal(t, "node1", b.Subject)
 }
@@ -19,6 +23,6 @@ func TestNewBaseFromJson(t *testing.T) {
 func TestSplitUnixNano(t *testing.T) {
 	now := 1257894000000000011
 	s, n := SplitUnixNano(int64(now))
-	assert.Equal(t, 1257894000, s)
-	assert.Equal(t, 11, n)
+	assert.Equal(t, int64(1257894000), s)
+	assert.Equal(t, int64(11), n)
 }
