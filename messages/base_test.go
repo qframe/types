@@ -9,6 +9,11 @@ import (
 	"github.com/qnib/qframe-types"
 )
 
+
+func NewConfig(kv map[string]string) *config.Config {
+	return config.NewConfig([]config.Provider{config.NewStatic(kv)})
+}
+
 func TestNewBase(t *testing.T) {
 	before := time.Now()
 	b := NewBase("src1")
@@ -121,12 +126,22 @@ func TestBase_StopProcessing(t *testing.T) {
 	ts := time.Unix(1499156134, 123124)
 	b := NewTimedBase("src1", ts)
 	b.SourceID = 1
-	cfgMap := map[string]string{}
-	cfg := config.NewConfig([]config.Provider{config.NewStatic(cfgMap)})
-	p := qtypes.NewPlugin(qtypes.NewQChan(), cfg)
+	cfg := NewConfig(map[string]string{})
+	p := qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
 	p.MyID = 1
 	assert.True(t, b.StopProcessing(p, false), "Same GID (p.MyID == b.SourceID), so we should stop here")
 	p.MyID = 2
 	assert.True(t, b.StopProcessing(p, false), "No empty input allowed, should stop here")
-	//assert.True(t, b.StopProcessing(p, true), "Allow empty imput, ")
+	cfg = NewConfig(map[string]string{"typ.name.inputs": "src2"})
+	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	assert.True(t, b.StopProcessing(p, false), "Input should not match, therefore expect to be stopped.")
+	cfg = NewConfig(map[string]string{
+		"typ.name.inputs": "src1",
+		"typ.name.source-success": "false",
+	})
+	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	assert.True(t, b.StopProcessing(p, false), "Source-success is false, therefore expect to be stopped.")
+	cfg = NewConfig(map[string]string{"typ.name.inputs": "src1"})
+	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	assert.False(t, b.StopProcessing(p, false), "Input should match, therefore expect to not be stopped.")
 }
