@@ -4,6 +4,7 @@ import (
 	"time"
 	"crypto/sha1"
 	"fmt"
+	"github.com/qnib/qframe-types"
 )
 
 const (
@@ -40,7 +41,7 @@ func NewTimedBase(src string, t time.Time) Base {
 
 func NewBaseFromBase(src string, b Base) Base {
 	return Base {
-		BaseVersion: version,
+		BaseVersion: b.BaseVersion,
 		ID: b.ID,
 		Time: b.Time,
 		SourceID: b.SourceID,
@@ -48,6 +49,18 @@ func NewBaseFromBase(src string, b Base) Base {
 		SourceSuccess: b.SourceSuccess,
 		Tags: b.Tags,
 		Data: b.Data,
+	}
+}
+
+func NewBaseFromOldBase(src string, b qtypes.Base) Base {
+	return Base {
+		BaseVersion: b.BaseVersion,
+		ID: b.ID,
+		Time: b.Time,
+		SourceID: b.SourceID,
+		SourcePath: append(b.SourcePath, src),
+		SourceSuccess: b.SourceSuccess,
+		Tags: b.Data,
 	}
 }
 
@@ -101,4 +114,33 @@ func Sha1HashString(s string) string {
 	h.Write([]byte(s))
 	bs := h.Sum(nil)
 	return fmt.Sprintf("%x", bs)
+}
+
+
+func (b *Base) StopProcessing(p qtypes.Plugin, allowEmptyInput bool) bool {
+	if p.MyID == b.SourceID {
+		p.Log("debug", "Msg came from the same GID")
+		return true
+	}
+	// TODO: Most likely invoked often, so check if performant enough
+	inputs := p.GetInputs()
+	fmt.Printf("! %v && len(%v)=%d\n", allowEmptyInput, inputs, len(inputs))
+	if ! allowEmptyInput && len(inputs) == 0 {
+		format := "Plugin '%s' does not allow empty imputs, please set '%s.%s.inputs'"
+		msg := fmt.Sprintf(format, p.Name, p.Typ, p.Name)
+		p.Log("error", msg)
+		return true
+	}
+	srcSuccess := p.CfgBoolOr("source-success", true)
+	/*
+	if ! b.InputsMatch(inputs) {
+		p.Log("debug", fmt.Sprintf("InputsMatch(%v) != %s", inputs, b.GetLastSource()))
+		return true
+	}*/
+	if b.SourceSuccess != srcSuccess {
+		msg := fmt.Sprintf("qm.SourceSuccess (%v) != (%v) srcSuccess", b.SourceSuccess, srcSuccess)
+		p.Log("debug", msg)
+		return true
+	}
+	return false
 }

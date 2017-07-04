@@ -4,6 +4,9 @@ import (
 	"testing"
 	"time"
 	"github.com/stretchr/testify/assert"
+	"github.com/zpatrick/go-config"
+
+	"github.com/qnib/qframe-types"
 )
 
 func TestNewBase(t *testing.T) {
@@ -98,4 +101,32 @@ func TestNewBaseFromBase(t *testing.T) {
 	assert.Equal(t, b1.SourceSuccess, b2.SourceSuccess)
 	assert.Equal(t, b1.Tags, b2.Tags)
 	assert.Equal(t, b1.Data, b2.Data)
+}
+
+func TestNewBaseFromOldBase(t *testing.T) {
+	ts := time.Unix(1499156134, 123124)
+	b1 := qtypes.NewTimedBase("src1", ts)
+	b1.Data["key1"] = "val1"
+	b2 := NewBaseFromOldBase("src2", b1)
+	assert.Equal(t, b1.BaseVersion, b2.BaseVersion)
+	assert.Equal(t, b1.ID, b2.ID)
+	assert.Equal(t, b1.Time, b2.Time)
+	assert.Equal(t, b1.SourceID, b2.SourceID)
+	assert.Equal(t, append(b1.SourcePath,"src2"), b2.SourcePath)
+	assert.Equal(t, b1.SourceSuccess, b2.SourceSuccess)
+	assert.Equal(t, b1.Data, b2.Tags)
+}
+
+func TestBase_StopProcessing(t *testing.T) {
+	ts := time.Unix(1499156134, 123124)
+	b := NewTimedBase("src1", ts)
+	b.SourceID = 1
+	cfgMap := map[string]string{}
+	cfg := config.NewConfig([]config.Provider{config.NewStatic(cfgMap)})
+	p := qtypes.NewPlugin(qtypes.NewQChan(), cfg)
+	p.MyID = 1
+	assert.True(t, b.StopProcessing(p, false), "Same GID (p.MyID == b.SourceID), so we should stop here")
+	p.MyID = 2
+	assert.True(t, b.StopProcessing(p, false), "No empty input allowed, should stop here")
+	//assert.True(t, b.StopProcessing(p, true), "Allow empty imput, ")
 }
