@@ -34,6 +34,24 @@ func NewBaseFromJson(qb qtypes_messages.Base, str string) (b Base, err error) {
 	return
 }
 
+func NewBase(b qtypes_messages.Base, subject,action,object interface{}, tags map[string]string) (Base, error) {
+	invBase, err := NewEmptyBase(b)
+	invBase.Subject = subject
+	invBase.Action = action
+	invBase.Object = object
+	invBase.Tags = tags
+	return invBase, err
+}
+
+func NewEmptyBase(b qtypes_messages.Base) (Base, error) {
+	var err error
+	invBase := Base{
+		Base: b,
+		Time: b.Time,
+		TimeUnixNano: b.Time.UnixNano(),
+	}
+	return invBase, err
+}
 
 func NewBaseFromContainerEvent(ce qtypes.ContainerEvent) (Base, error) {
 	var err error
@@ -52,7 +70,7 @@ func NewBaseFromContainerEvent(ce qtypes.ContainerEvent) (Base, error) {
 
 func (b *Base) EnrichContainer(ce qtypes.ContainerEvent) {
 	// TODO: Has to change to ID
-	b.Subject = ce.EngineInfo.Name
+	//b.Subject = ce.EngineInfo.Name
 	b.Action = ce.Event.Action
 	b.Object = ce.Container.Name
 }
