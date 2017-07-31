@@ -21,6 +21,7 @@ type Base struct {
 	BaseVersion 	string
 	Version 		string
 	QChan 			qtypes_qchannel.QChan
+	ErrChan			chan error
 	Cfg 			*config.Config
 	MyID			int
 	Typ				string
@@ -36,6 +37,7 @@ func NewBase(qChan qtypes_qchannel.QChan, cfg *config.Config) Base {
 	b := Base{
 		BaseVersion: version,
 		QChan: qChan,
+		ErrChan: make(chan error),
 		Cfg: cfg,
 		LogOnlyPlugs:   []string{},
 		MsgCount:       map[string]float64{

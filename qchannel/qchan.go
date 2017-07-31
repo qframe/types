@@ -2,7 +2,6 @@ package qtypes_qchannel
 
 
 import (
-	"os"
 	"log"
 
 	"github.com/grafov/bcast"
@@ -15,10 +14,9 @@ import (
 // QChan holds the broadcast channels to communicate
 type QChan struct {
 	Data *bcast.Group
-	Back *bcast.Group
+	Done *bcast.Group
 	Tick *bcast.Group
 	Cfg *config.Config
-	Done chan os.Signal
 }
 
 func (qc *QChan) Log(logLevel, msg string) {
@@ -46,10 +44,9 @@ func NewQChan() QChan {
 func NewCfgQChan(cfg *config.Config) QChan {
 	return QChan{
 		Data: bcast.NewGroup(), // create broadcast group
-		Back: bcast.NewGroup(), // create broadcast group
+		Done: bcast.NewGroup(), // create broadcast group
 		Tick: bcast.NewGroup(), // create broadcast group
 		Cfg: cfg,
-		Done: make(chan os.Signal, 1),
 	}
 }
 
@@ -57,7 +54,7 @@ func NewCfgQChan(cfg *config.Config) QChan {
 func (qc *QChan) Broadcast() {
 	qc.Log("info", "Dispatch broadcast for Back, Data and Tick")
 	go qc.Data.Broadcast(0)
-	go qc.Back.Broadcast(0)
+	go qc.Done.Broadcast(0)
 	go qc.Tick.Broadcast(0)
 }
 
