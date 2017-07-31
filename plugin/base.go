@@ -13,13 +13,18 @@ import (
 	"github.com/qframe/types/ticker"
 )
 
+const (
+	version = "0.1.2"
+)
+
 type Base struct {
+	BaseVersion 	string
+	Version 		string
 	QChan 			qtypes_qchannel.QChan
 	Cfg 			*config.Config
 	MyID			int
 	Typ				string
 	Pkg				string
-	Version 		string
 	Name 			string
 	LogOnlyPlugs 	[]string
 	MsgCount		map[string]float64
