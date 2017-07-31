@@ -34,6 +34,7 @@ type Base struct {
 
 func NewBase(qChan qtypes_qchannel.QChan, cfg *config.Config) Base {
 	b := Base{
+		BaseVersion: version,
 		QChan: qChan,
 		Cfg: cfg,
 		LogOnlyPlugs:   []string{},
