@@ -52,7 +52,7 @@ func NewCfgQChan(cfg *config.Config) QChan {
 
 
 func (qc *QChan) Broadcast() {
-	qc.Log("info", "Dispatch broadcast for Back, Data and Tick")
+	qc.Log("info", "Dispatch broadcast for Data, Done and Tick")
 	go qc.Data.Broadcast(0)
 	go qc.Done.Broadcast(0)
 	go qc.Tick.Broadcast(0)
