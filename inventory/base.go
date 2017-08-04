@@ -4,7 +4,7 @@ import (
 	"time"
 	"encoding/json"
 	"github.com/qframe/types/messages"
-	"github.com/qnib/qframe-types"
+	"github.com/qframe/types/docker-events"
 )
 
 const nanoX = 1000000000
@@ -34,11 +34,29 @@ func NewBaseFromJson(qb qtypes_messages.Base, str string) (b Base, err error) {
 	return
 }
 
+func NewBase(b qtypes_messages.Base, subject,action,object interface{}, tags map[string]string) (Base, error) {
+	invBase, err := NewEmptyBase(b)
+	invBase.Subject = subject
+	invBase.Action = action
+	invBase.Object = object
+	invBase.Tags = tags
+	return invBase, err
+}
 
-func NewBaseFromContainerEvent(ce qtypes.ContainerEvent) (Base, error) {
+func NewEmptyBase(b qtypes_messages.Base) (Base, error) {
+	var err error
+	invBase := Base{
+		Base: b,
+		Time: b.Time,
+		TimeUnixNano: b.Time.UnixNano(),
+	}
+	return invBase, err
+}
+
+func NewBaseFromContainerEvent(ce qtypes_docker_events.ContainerEvent) (Base, error) {
 	var err error
 	b := Base{
-		Base: qtypes_messages.NewBaseFromOldBase("inventory", ce.Base),
+		Base: ce.Base,
 		Time: ce.Time,
 		TimeUnixNano: ce.Time.UnixNano(),
 	}
@@ -50,9 +68,9 @@ func NewBaseFromContainerEvent(ce qtypes.ContainerEvent) (Base, error) {
 }
 
 
-func (b *Base) EnrichContainer(ce qtypes.ContainerEvent) {
+func (b *Base) EnrichContainer(ce qtypes_docker_events.ContainerEvent) {
 	// TODO: Has to change to ID
-	b.Subject = ce.EngineInfo.Name
+	//b.Subject = ce.EngineInfo.Name
 	b.Action = ce.Event.Action
 	b.Object = ce.Container.Name
 }

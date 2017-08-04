@@ -4,11 +4,11 @@ import (
 	"time"
 	"crypto/sha1"
 	"fmt"
-	"github.com/qnib/qframe-types"
+	"github.com/qframe/types/plugin"
 )
 
 const (
-	version = "0.1.1"
+	version = "0.1.3"
 )
 
 type Base struct {
@@ -19,7 +19,6 @@ type Base struct {
 	SourcePath		[]string
 	SourceSuccess 	bool
 	Tags 			map[string]string // Additional KV
-	Data			interface{}
 }
 
 func NewBase(src string) Base {
@@ -48,22 +47,23 @@ func NewBaseFromBase(src string, b Base) Base {
 		SourcePath: append(b.SourcePath, src),
 		SourceSuccess: b.SourceSuccess,
 		Tags: b.Tags,
-		Data: b.Data,
 	}
 }
 
-func NewBaseFromOldBase(src string, b qtypes.Base) Base {
-	return Base {
-		BaseVersion: b.BaseVersion,
-		ID: b.ID,
-		Time: b.Time,
-		SourceID: b.SourceID,
-		SourcePath: append(b.SourcePath, src),
-		SourceSuccess: b.SourceSuccess,
-		Tags: b.Data,
-	}
-}
 
+func (b *Base) ToJSON() map[string]interface{} {
+	res := map[string]interface{}{
+		"base_version": b.BaseVersion,
+		"id": b.ID,
+		"time": b.Time.String(),
+		"time_unix_nano": b.Time.UnixNano(),
+	}
+	res["source_id"] = b.SourceID
+	res["source_path"] = b.SourcePath
+	res["source_success"] = b.SourceSuccess
+	res["tags"] = b.Tags
+	return res
+}
 
 // GenDefaultID uses "<source>-<time.UnixNano()>" and does a sha1 hash.
 func (b *Base) GenDefaultID() string {
@@ -117,7 +117,7 @@ func Sha1HashString(s string) string {
 }
 
 
-func (b *Base) StopProcessing(p qtypes.Plugin, allowEmptyInput bool) bool {
+func (b *Base) StopProcessing(p *qtypes_plugin.Plugin, allowEmptyInput bool) bool {
 	if b.SourceID != 0 && p.MyID == b.SourceID {
 		msg := fmt.Sprintf("Msg came from the same GID (My:%d == %d:SourceID)", p.MyID, b.SourceID)
 		p.Log("debug", msg)

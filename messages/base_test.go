@@ -7,6 +7,7 @@ import (
 	"github.com/zpatrick/go-config"
 
 	"github.com/qnib/qframe-types"
+	"reflect"
 )
 
 
@@ -93,6 +94,26 @@ func TestBase_GetTimeRFC(t *testing.T) {
 	assert.Equal(t, exp, got)
 }
 
+func TestBase_ToJSON(t *testing.T) {
+	ts := time.Unix(1499156134, 123124)
+	b := NewTimedBase("src1", ts)
+	b.ID = "0.1"
+	exp := map[string]interface{}{
+		"base_version": b.BaseVersion,
+		"id": "0.1",
+		"time": ts.String(),
+		"time_unix_nano": ts.UnixNano(),
+		"source_id": 0,
+		"source_path": []string{"src1"},
+		"source_success": true,
+		"tags": map[string]string{},
+	}
+	got := b.ToJSON()
+	assert.Equal(t, exp["time"], got["time"])
+	assert.True(t, reflect.DeepEqual(exp, got), "Not deeply equal")
+	assert.True(t, true)
+}
+
 func TestNewBaseFromBase(t *testing.T) {
 	ts := time.Unix(1499156134, 123124)
 	b1 := NewTimedBase("src1", ts)
@@ -105,13 +126,11 @@ func TestNewBaseFromBase(t *testing.T) {
 	assert.Equal(t, append(b1.SourcePath,"src2"), b2.SourcePath)
 	assert.Equal(t, b1.SourceSuccess, b2.SourceSuccess)
 	assert.Equal(t, b1.Tags, b2.Tags)
-	assert.Equal(t, b1.Data, b2.Data)
 }
 
 func TestNewBaseFromOldBase(t *testing.T) {
 	ts := time.Unix(1499156134, 123124)
 	b1 := qtypes.NewTimedBase("src1", ts)
-	b1.Data["key1"] = "val1"
 	b2 := NewBaseFromOldBase("src2", b1)
 	assert.Equal(t, b1.BaseVersion, b2.BaseVersion)
 	assert.Equal(t, b1.ID, b2.ID)
@@ -119,7 +138,6 @@ func TestNewBaseFromOldBase(t *testing.T) {
 	assert.Equal(t, b1.SourceID, b2.SourceID)
 	assert.Equal(t, append(b1.SourcePath,"src2"), b2.SourcePath)
 	assert.Equal(t, b1.SourceSuccess, b2.SourceSuccess)
-	assert.Equal(t, b1.Data, b2.Tags)
 }
 
 func TestBase_StopProcessing(t *testing.T) {
