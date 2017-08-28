@@ -1,7 +1,7 @@
 package qtypes_interfaces
 
 import (
-	"github.com/docker/docker/api/types"
+	"github.com/moby/moby/api/types"
 )
 
 type ContainerInventory interface {

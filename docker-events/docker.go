@@ -3,7 +3,7 @@ package qtypes_docker_events
 import (
 
 	"github.com/qframe/types/messages"
-	"github.com/docker/docker/api/types/events"
+	"github.com/moby/moby/api/types/events"
 	"fmt"
 )
 
