@@ -56,10 +56,8 @@ func (r *Registry) doVisit(mode Mode, vs Visitor) {
 	defer r.mu.RUnlock()
 
 	for key, v := range r.entries {
-		if _, isReg := v.Var.(*Registry); !isReg {
-			if v.Mode > mode {
-				continue
-			}
+		if v.Mode > mode {
+			continue
 		}
 
 		vs.OnKey(key)
@@ -128,21 +126,10 @@ func (r *Registry) Clear() error {
 // Add adds a new variable to the registry. The method panics if the variables
 // name is already in use.
 func (r *Registry) Add(name string, v Var, m Mode) {
-	opts := r.opts
-	if m != opts.mode {
-		tmp := *r.opts
-		tmp.mode = m
-		opts = &tmp
-	}
-
-	panicErr(r.addNames(strings.Split(name, "."), v, opts))
+	panicErr(r.addNames(strings.Split(name, "."), v, m))
 }
 
-func (r *Registry) doAdd(name string, v Var, opts *options) {
-	panicErr(r.addNames(strings.Split(name, "."), v, opts))
-}
-
-func (r *Registry) addNames(names []string, v Var, opts *options) error {
+func (r *Registry) addNames(names []string, v Var, m Mode) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -152,7 +139,7 @@ func (r *Registry) addNames(names []string, v Var, opts *options) error {
 			return fmt.Errorf("name %v already used", name)
 		}
 
-		r.entries[name] = entry{v, opts.mode}
+		r.entries[name] = entry{v, m}
 		return nil
 	}
 
@@ -162,12 +149,12 @@ func (r *Registry) addNames(names []string, v Var, opts *options) error {
 			return fmt.Errorf("name %v already used", name)
 		}
 
-		return reg.addNames(names[1:], v, opts)
+		return reg.addNames(names[1:], v, m)
 	}
 
 	sub := NewRegistry()
-	sub.opts = opts
-	if err := sub.addNames(names[1:], v, opts); err != nil {
+	sub.opts = r.opts
+	if err := sub.addNames(names[1:], v, m); err != nil {
 		return err
 	}
 

@@ -1,12 +1,10 @@
 package logp
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"runtime/debug"
-	"strings"
 	"time"
 )
 
@@ -25,14 +23,13 @@ const (
 	LOG_DEBUG
 )
 
-type logger struct {
+type Logger struct {
 	toSyslog          bool
 	toStderr          bool
 	toFile            bool
 	level             Priority
 	selectors         map[string]struct{}
 	debugAllSelectors bool
-	JSON              bool
 
 	logger  *log.Logger
 	syslog  [LOG_DEBUG + 1]*log.Logger
@@ -43,7 +40,7 @@ type logger struct {
 
 const stderrLogFlags = log.Ldate | log.Ltime | log.Lmicroseconds | log.LUTC | log.Lshortfile
 
-var _log = logger{}
+var _log = Logger{}
 
 // TODO: remove toSyslog and toStderr from the init function
 func LogInit(level Priority, prefix string, toSyslog bool, toStderr bool, debugSelectors []string) {
@@ -76,50 +73,21 @@ func parseSelectors(selectors []string) (map[string]struct{}, bool) {
 
 func debugMessage(calldepth int, selector, format string, v ...interface{}) {
 	if _log.level >= LOG_DEBUG && IsDebug(selector) {
-		send(calldepth+1, LOG_DEBUG, "DBG", format, v...)
+		send(calldepth+1, LOG_DEBUG, "DBG  ", format, v...)
 	}
 }
 
 func send(calldepth int, level Priority, prefix string, format string, v ...interface{}) {
-
-	message := fmt.Sprintf(format, v...)
-	timestamp := time.Now().Format(time.RFC3339)
-	var bytes []byte
-	if _log.JSON {
-		log := map[string]interface{}{
-			"timestamp": timestamp,
-			"level":     prefix,
-			"message":   message,
-		}
-		bytes, _ = json.Marshal(log)
-	} else {
-		// Creates the log message and formats it
-		bytes = []byte(fmt.Sprintf("%s %s %s", timestamp, prefix, message))
-	}
-
 	if _log.toSyslog {
-		if _log.JSON {
-			_log.syslog[level].Output(calldepth, string(bytes))
-		} else {
-			_log.syslog[level].Output(calldepth, string(message))
-		}
+		_log.syslog[level].Output(calldepth, fmt.Sprintf(format, v...))
 	}
 	if _log.toStderr {
-		if _log.JSON {
-			_log.logger.Output(calldepth, string(bytes))
-		} else {
-			_log.logger.Output(calldepth, fmt.Sprintf("%s %s", prefix, message))
-		}
+		_log.logger.Output(calldepth, fmt.Sprintf(prefix+format, v...))
 	}
 	if _log.toFile {
-		if _log.JSON {
-			_log.rotator.WriteLine(bytes)
-		} else {
-			// Makes sure all prefixes have the same length
-			prefix = prefix + strings.Repeat(" ", 4-len(prefix))
-			bytes = []byte(fmt.Sprintf("%s %s %s", timestamp, prefix, message))
-			_log.rotator.WriteLine(bytes)
-		}
+		// Creates a timestamp for the file log message and formats it
+		prefix = time.Now().Format(time.RFC3339) + " " + prefix
+		_log.rotator.WriteLine([]byte(fmt.Sprintf(prefix+format, v...)))
 	}
 }
 
@@ -149,42 +117,25 @@ func msg(level Priority, prefix string, format string, v ...interface{}) {
 }
 
 func Info(format string, v ...interface{}) {
-	msg(LOG_INFO, "INFO", format, v...)
+	msg(LOG_INFO, "INFO ", format, v...)
 }
 
 func Warn(format string, v ...interface{}) {
-	msg(LOG_WARNING, "WARN", format, v...)
+	msg(LOG_WARNING, "WARN ", format, v...)
 }
 
 func Err(format string, v ...interface{}) {
-	msg(LOG_ERR, "ERR", format, v...)
+	msg(LOG_ERR, "ERR ", format, v...)
 }
 
 func Critical(format string, v ...interface{}) {
-	msg(LOG_CRIT, "CRIT", format, v...)
-}
-
-// Deprecate logs a deprecation message.
-// The version string contains the version when the future will be removed
-func Deprecate(version string, format string, v ...interface{}) {
-	postfix := fmt.Sprintf(" Will be removed in version: %s", version)
-	Warn("DEPRECATED: "+format+postfix, v...)
-}
-
-// Experimental logs the usage of an experimental feature.
-func Experimental(format string, v ...interface{}) {
-	Warn("EXPERIMENTAL: "+format, v...)
-}
-
-// Beta logs the usage of an beta feature.
-func Beta(format string, v ...interface{}) {
-	Warn("BETA: "+format, v...)
+	msg(LOG_CRIT, "CRIT ", format, v...)
 }
 
 // WTF prints the message at CRIT level and panics immediately with the same
 // message
 func WTF(format string, v ...interface{}) {
-	msg(LOG_CRIT, "CRIT", format, v)
+	msg(LOG_CRIT, "CRIT ", format, v)
 	panic(fmt.Sprintf(format, v...))
 }
 

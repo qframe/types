@@ -1,5 +1,10 @@
 package qtypes_interfaces
 
-type Message interface {
-	//StopProcessing(p QPlugin, emptyInp bool) bool
+import (
+	"time"
+)
+
+type BaseMessage interface {
+	StopProcessing(p BasePlugin) bool
+	GetTime() time.Time
 }

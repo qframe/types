@@ -154,6 +154,10 @@ func (p *Base) StartTicker(name string, durMs int) qtypes_ticker.Ticker {
 	return ticker
 }
 
+func (b *Base) SendData(msg interface{}) {
+	b.QChan.SendData(msg)
+}
+
 /*
 func (p *Base) DispatchMsgCount() {
 

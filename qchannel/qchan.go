@@ -53,9 +53,9 @@ func NewCfgQChan(cfg *config.Config) QChan {
 
 func (qc *QChan) Broadcast() {
 	qc.Log("info", "Dispatch broadcast for Data, Done and Tick")
-	go qc.Data.Broadcast(0)
-	go qc.Done.Broadcast(0)
-	go qc.Tick.Broadcast(0)
+	go qc.Data.Broadcast()
+	go qc.Done.Broadcast()
+	go qc.Tick.Broadcast()
 }
 
 func (qc *QChan) SendData(val interface{}) {
