@@ -5,9 +5,9 @@ import (
 	"time"
 	"github.com/stretchr/testify/assert"
 	"github.com/zpatrick/go-config"
-
-	"github.com/qnib/qframe-types"
 	"reflect"
+	"github.com/qframe/types/plugin"
+	"github.com/qframe/types/qchannel"
 )
 
 
@@ -128,38 +128,27 @@ func TestNewBaseFromBase(t *testing.T) {
 	assert.Equal(t, b1.Tags, b2.Tags)
 }
 
-func TestNewBaseFromOldBase(t *testing.T) {
-	ts := time.Unix(1499156134, 123124)
-	b1 := qtypes.NewTimedBase("src1", ts)
-	b2 := NewBaseFromOldBase("src2", b1)
-	assert.Equal(t, b1.BaseVersion, b2.BaseVersion)
-	assert.Equal(t, b1.ID, b2.ID)
-	assert.Equal(t, b1.Time, b2.Time)
-	assert.Equal(t, b1.SourceID, b2.SourceID)
-	assert.Equal(t, append(b1.SourcePath,"src2"), b2.SourcePath)
-	assert.Equal(t, b1.SourceSuccess, b2.SourceSuccess)
-}
-
 func TestBase_StopProcessing(t *testing.T) {
+	qChan := qtypes_qchannel.NewQChan()
 	ts := time.Unix(1499156134, 123124)
 	b := NewTimedBase("src1", ts)
 	b.SourceID = 1
 	cfg := NewConfig(map[string]string{})
-	p := qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	p := qtypes_plugin.NewNamedPlugin(qChan, cfg,"typ", "pkg", "name", "0.0.0" )
 	p.MyID = 1
 	assert.True(t, b.StopProcessing(p, false), "Same GID (p.MyID == b.SourceID), so we should stop here")
 	p.MyID = 2
 	assert.True(t, b.StopProcessing(p, false), "No empty input allowed, should stop here")
 	cfg = NewConfig(map[string]string{"typ.name.inputs": "src2"})
-	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	p = qtypes_plugin.NewNamedPlugin(qChan, cfg,"typ", "pkg", "name", "0.0.0" )
 	assert.True(t, b.StopProcessing(p, false), "Input should not match, therefore expect to be stopped.")
 	cfg = NewConfig(map[string]string{
 		"typ.name.inputs": "src1",
 		"typ.name.source-success": "false",
 	})
-	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	p = qtypes_plugin.NewNamedPlugin(qChan, cfg,"typ", "pkg", "name", "0.0.0" )
 	assert.True(t, b.StopProcessing(p, false), "Source-success is false, therefore expect to be stopped.")
 	cfg = NewConfig(map[string]string{"typ.name.inputs": "src1"})
-	p = qtypes.NewNamedPlugin(qtypes.NewQChan(), cfg,"typ", "pkg", "name", "0.0.0" )
+	p = qtypes_plugin.NewNamedPlugin(qChan, cfg,"typ", "pkg", "name", "0.0.0" )
 	assert.False(t, b.StopProcessing(p, false), "Input should match, therefore expect to not be stopped.")
 }
