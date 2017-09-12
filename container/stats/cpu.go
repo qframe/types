@@ -6,7 +6,7 @@ import (
 	"github.com/docker/docker/api/types"
 	dc "github.com/fsouza/go-dockerclient"
 	"github.com/qframe/types/messages"
-	"github.com/qframe/types/metrics"
+	//"github.com/qframe/types/metrics"
 )
 
 // Inspired by https://github.com/elastic/beats/blob/master/metricbeat/module/docker/cpu/helper.go
@@ -38,16 +38,15 @@ func NewCPUStats(src qtypes_messages.Base, stats *dc.Stats) CPUStats {
 }
 
 
-func (cs *CPUStats) ToMetrics(src string) []qtypes_metrics.Metric {
+/*func (cs *CPUStats) ToMetrics(src string) []qtypes_metrics.Metric {
 	//dim := qtypes_helper.AssembleDefaultDimensions(cs.Container)
 	return []qtypes_metrics.Metric{
-		/*
 		cs.NewExtMetric(src, "cpu.usage.kernel.percent", qtypes_metrics.Gauge, cs.UsageInKernelmodePercentage, dim, cs.Time, true),
 		cs.NewExtMetric(src, "cpu.usage.user.percent", qtypes_metrics.Gauge, cs.UsageInUsermodePercentage, dim, cs.Time, true),
 		cs.NewExtMetric(src, "cpu.system.usage.percent", qtypes_metrics.Gauge, cs.SystemUsagePercentage, dim, cs.Time, true),
-		*/
+
 	}
-}
+}*/
 
 
 func perCpuUsage(stats *dc.Stats) common.MapStr {
