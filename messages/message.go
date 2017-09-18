@@ -21,7 +21,8 @@ func NewMessage(b Base, msg string) Message {
 	return m
 }
 
-func (m *Message) ParseJsonMap(p *qtypes_plugin.Plugin, keys mapset.Set, kv map[string]string) {
+func (m *Message) ParseJsonMap(p *qtypes_plugin.Plugin, keys mapset.Set, kv map[string]string) map[string]string {
+	res := map[string]string{}
 	it := keys.Iterator()
 	for val := range it.C {
 		key := val.(string)
@@ -35,14 +36,14 @@ func (m *Message) ParseJsonMap(p *qtypes_plugin.Plugin, keys mapset.Set, kv map[
 		var dat map[string]interface{}
 		json.Unmarshal(byt, &dat)
 		for k, v := range dat {
-			if _, ok := m.Tags[k]; !ok {
-				p.Log("debug", fmt.Sprintf("New key in tag '%s' for message '%s'", k, v))
-				m.Tags[k] = fmt.Sprintf("%s", v)
-			} else {
-				p.Log("debug", fmt.Sprintf("Overwrite tag '%s' in message '%s'", k, v))
-				m.Tags[k] = fmt.Sprintf("%s", v)
-			}
+			res[k] = fmt.Sprintf("%v", v)
 		}
 	}
+	return res
+}
 
+// ToStringRFC54242 returns a string in RFC5424 format
+func (m *Message) ToStringRFC54242() (res string, err error) {
+
+	return
 }
