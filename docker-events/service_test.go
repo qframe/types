@@ -8,6 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/docker/docker/api/types/events"
+	"github.com/docker/docker/api/types"
+
 	"github.com/qframe/types/messages"
 	"github.com/qframe/types/helper"
 	"github.com/docker/docker/api/types/swarm"
@@ -24,7 +26,8 @@ func TestServiceEvent_ToJSON(t *testing.T) {
 	srv := swarm.Service{
 		ID: "12345",
 	}
-	de := NewDockerEvent(b, event)
+	info := types.Info{ID: "EngineID1"}
+	de := NewDockerEvent(b, info, event)
 	se := NewServiceEvent(de, srv)
 	exp := map[string]interface{}{
 		"base_version": b.BaseVersion,

@@ -32,10 +32,10 @@ func TestUnitContainerMessage_GetContainerName(t *testing.T) {
 	cnt1 := NewBridgedOnlyContainer("CntID1", "CntName1", "192.168.0.1")
 	cnt2 := NewBridgedOnlyContainer("CntID1", "", "192.168.0.1")
 	b := NewTimedBase("test1", t1)
-	cm := NewContainerMessage(b, cnt1, "This is a message")
+	cm := NewContainerMessage(b, &cnt1, "This is a message")
 	got := cm.GetContainerName()
 	assert.Equal(t, "CntName1", got)
-	cm = NewContainerMessage(b, cnt2, "This is a message")
+	cm = NewContainerMessage(b, &cnt2, "This is a message")
 	got = cm.GetContainerName()
 	assert.Equal(t, "<none>", got)
 }
