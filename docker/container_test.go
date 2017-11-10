@@ -1,4 +1,4 @@
-package qtypes_docker_events
+package qtypes_docker
 
 import (
 	"testing"

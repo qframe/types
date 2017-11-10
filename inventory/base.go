@@ -4,7 +4,7 @@ import (
 	"time"
 	"encoding/json"
 	"github.com/qframe/types/messages"
-	"github.com/qframe/types/docker-events"
+	"github.com/qframe/types/docker"
 )
 
 const nanoX = 1000000000
