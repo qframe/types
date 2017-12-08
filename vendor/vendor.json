@@ -426,17 +426,17 @@
 			"revisionTime": "2016-01-10T10:55:54Z"
 		},
 		{
-			"checksumSHA1": "WdOalEY1OLMxWKklnv7RjCSypYU=",
+			"checksumSHA1": "0Xj4ELvinVxZNzoeXV+adY5Ea9c=",
 			"path": "github.com/qnib/qframe-types",
-			"revision": "9a758cfbe481225d6aec305eba80c385f9298ac9",
-			"revisionTime": "2017-08-03T11:51:52Z"
+			"revision": "5472019f4b0c27f9f6e7ea61c93685972e292d62",
+			"revisionTime": "2017-07-03T19:59:37Z"
 		},
 		{
 			"checksumSHA1": "Urhq3MJWVz6GbfE0AFQXkDsSPyQ=",
 			"origin": "github.com/qnib/qframe-types/vendor/github.com/qnib/qframe-utils",
 			"path": "github.com/qnib/qframe-utils",
-			"revision": "9a758cfbe481225d6aec305eba80c385f9298ac9",
-			"revisionTime": "2017-08-03T11:51:52Z"
+			"revision": "5472019f4b0c27f9f6e7ea61c93685972e292d62",
+			"revisionTime": "2017-07-03T19:59:37Z"
 		},
 		{
 			"checksumSHA1": "zmC8/3V4ls53DJlNTKDZwPSC/dA=",

@@ -152,3 +152,15 @@ func TestBase_StopProcessing(t *testing.T) {
 	p = qtypes_plugin.NewNamedPlugin(qChan, cfg,"typ", "pkg", "name", "0.0.0" )
 	assert.False(t, b.StopProcessing(p, false), "Input should match, therefore expect to not be stopped.")
 }
+
+func TestBase_ToFlatJSON(t *testing.T) {
+	ts := time.Unix(1499156134, 123124)
+	b := NewTimedBase("src1", ts)
+	b.Tags = map[string]string{"key1":"val1","key2":"val2"}
+	got := b.ToFlatJSON()
+	assert.Equal(t, "src1", got["msg_source_path"])
+	assert.Equal(t, "val1", got["msg_tag_key1"])
+	assert.Equal(t, "val2", got["msg_tag_key2"])
+	assert.Equal(t, version, got["msg_base_version"])
+	assert.Equal(t, "1499156134000123124", got["msg_time_unix_nano"])
+}
