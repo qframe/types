@@ -4,7 +4,6 @@ import (
 	"github.com/fsouza/go-dockerclient"
 	"github.com/docker/docker/api/types"
 	"github.com/qframe/types/messages"
-	"github.com/qframe/types/container/stats"
 )
 
 type ContainerStats struct {
@@ -32,11 +31,12 @@ func (cs *ContainerStats) GetContainer() *types.Container {
 	}
 }
 
+/*
 // Flat out copied from https://github.com/elastic/beats
 func (cs *ContainerStats) GetCpuStats() qtypes_container_stats.CPUStats {
 	return qtypes_container_stats.NewCPUStats(cs.Base, cs.Stats)
 }
-/*
+
 func (cs *ContainerStats) GetMemStats() MemoryStats {
 	cnt := cs.GetContainer()
 	// TODO: Use NewMemoryStats?

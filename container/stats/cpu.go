@@ -1,5 +1,6 @@
 package qtypes_container_stats
 
+/*
 import (
 	"strconv"
 	"github.com/elastic/beats/libbeat/common"
@@ -46,7 +47,7 @@ func NewCPUStats(src qtypes_messages.Base, stats *dc.Stats) CPUStats {
 		cs.NewExtMetric(src, "cpu.system.usage.percent", qtypes_metrics.Gauge, cs.SystemUsagePercentage, dim, cs.Time, true),
 
 	}
-}*/
+}
 
 
 func perCpuUsage(stats *dc.Stats) common.MapStr {
@@ -93,4 +94,4 @@ func calculateLoad(value uint64) float64 {
 }
 
 // \beats
-
+*/
